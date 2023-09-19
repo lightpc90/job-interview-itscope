@@ -12,13 +12,12 @@ const {
 
 router.route("/").get(isAdmin, allTransactions);
 
-router
-  .route("/transaction/:id/")
-  .get(getSingleTransaction)
-  .post(addNewTransaction);
+router.route("/transaction/").post(addNewTransaction);
 
-router
-    .route('/my-transactions/:user_id')
+router.route("/transaction/:transaction_id/").get(getSingleTransaction);
+  
+
+router.route('/my-transactions/:user_id')
     .get(getMyTransactions)
 
 router.route("/my-business-transactions/:business_id").get(getMyBusinessTransactions);

@@ -3,7 +3,8 @@ const bcrypt = require("bcrypt")
 
 const handleRegistration = async (req, res) => {
     const { user, email, pwd, role } = req.body;
-    if(role !== "business" || role !== "user") return res.status(400).json({message: 'invalid role'})
+    console.log("role: ", role)
+    if(role !== "Business" || role !== "User" ) return res.status(400).json({message: 'invalid role: Business or User'})
   if (!user || !email || !pwd)
     return res
       .status(400)

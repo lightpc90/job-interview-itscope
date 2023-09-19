@@ -12,9 +12,6 @@ const {
 } = require("../controllers/productsController");
 
 
-router.route('/')
-    .get(isAdmin, allProducts)
-
 router.route("/new-product/")
     .post(isVerifiedBusiness, addNewProduct);
 

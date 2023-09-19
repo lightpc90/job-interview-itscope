@@ -5,7 +5,7 @@ const transactions = require("../model/schema/Transaction");
 //############  function to get the list of all transactions  ###############
 const allTransactions = async (req, res) => {
   try {
-    const transactions = await db.many(`SELECT * FROM transactions`);
+    const transactions = await db.any(`SELECT * FROM transactions`);
     if (transactions.length < 1)
       return res.status(200).json({ message: "No transaction has been made" });
     //when atleast a transaction has been made
@@ -34,7 +34,7 @@ const addNewTransaction = async (req, res) => {
         let total = 0
 
         for (const item of cartItems) {
-            const itemIsAvailable = await db.one(
+            const itemIsAvailable = await db.oneOrNone(
                 "SELECT * FROM products WHERE id=$1 AND quantities>=$2", [item.id, item.quantity]
             )
             if (!itemIsAvailable) {
@@ -73,7 +73,7 @@ const addNewTransaction = async (req, res) => {
 //############  function to get a transaction  ###############
 const getSingleTransaction = async (req, res) => {
   const { transaction_id } = req.params;
-  const transaction = await db.one(`SELECT * FROM transactions WHERE id = $1`, [
+  const transaction = await db.oneOrNone(`SELECT * FROM transactions WHERE id = $1`, [
     transaction_id,
   ]);
   if (!transaction) {
@@ -91,7 +91,7 @@ const getMyTransactions = async (req, res) => {
     if(current_userId !== user_id) return res.status(401).json({message: 'access denied: unauthorized user'})
   try {
     //get the current user's transactions
-    const myTransactions = await db.many(
+    const myTransactions = await db.any(
       `SELECT * FROM transactions WHERE buyer_id=$1`,
       [user_id]
     );
@@ -119,7 +119,7 @@ const getMyBusinessTransactions = async (req, res) => {
     if(current_userId !== business_id) return res.status(401).json({message: 'access denied: unauthorized user'})
   try {
     //get the transactions that the current business is involved
-    const inclusiveTransactions = await db.many(
+    const inclusiveTransactions = await db.any(
       `SELECT * FROM transactions WHERE $1=ANY(sellers_ids)`,
       [seller_id]
     );

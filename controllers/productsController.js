@@ -1,12 +1,13 @@
 const db = require("../model/db")
-const products = require("../model/schema/Product")
+const {ParameterizedQuery: PQ} = require('pg-promise')
 
 
 //############  function to get the list of all products  ###############
 const allProducts = async (req, res) => {
+    // const findAllproducts = new PQ({text: 'SELECT * FROM products'})
     try {
-        const products = await db.many(`SELECT * FROM products`);
-        if (products.length < 1) return res.status(200).json({ message: 'No product has been listed' })
+        const products = await db.any(`SELECT * FROM products`);
+        if (!products || products.length < 1) return res.status(400).json({ message: 'No product has been listed' })
         //when atleast a product has been listed
         return res.status(200).json({data: products})
     } catch (err) {
@@ -52,7 +53,7 @@ const getSingleProduct = async(req, res) => {
 const getBusinessProducts = async(req, res) => {
     const { business_id } = req.params
 
-    const businessProducts = await db.many(`SELECT * FROM products WHERE business_id = $1`, [business_id])
+    const businessProducts = await db.any(`SELECT * FROM products WHERE business_id = $1`, [business_id])
     if (!businessProducts) {
         console.log("No product with business Id: ", business_id)
         return res.status(404).json({error: `No product with business Id ${business_id}`})
