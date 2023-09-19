@@ -1,10 +1,9 @@
 const express = require("express")
 const router = express.Router()
 const isAdmin = require("../middleware/isAdmin")
+const isValidProduct = require("../middleware/isValidProduct")
 const isVerifiedBusiness = require("../middleware/isVerifiedBusiness")
 const {
-    allProducts,
-    getSingleProduct,
     getBusinessProducts,
     addNewProduct,
     updateProduct,
@@ -12,12 +11,11 @@ const {
 } = require("../controllers/productsController");
 
 
-router.route("/new-product/")
-    .post(isVerifiedBusiness, addNewProduct);
+router.route("/new-product/:business_id")
+    .post(isVerifiedBusiness, isValidProduct, addNewProduct);
 
 router.route('/product/:product_id/:business_id')
-    .get(getSingleProduct)
-    .patch(isVerifiedBusiness, updateProduct)
+    .patch(isVerifiedBusiness, isValidProduct, updateProduct)
     .delete(isVerifiedBusiness, handleProductDelete);
 
 router.route('/:business_id/products/').get(isVerifiedBusiness, getBusinessProducts)

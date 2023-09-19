@@ -28,7 +28,7 @@ const createFunction = `
 
 
 
-async function checkTriggerExistence() {
+async function checkTriggerExistence(db) {
 
     // Table and trigger names
     const tableName = "transactions";
@@ -63,6 +63,8 @@ const createTrigger = `
 `;
 
 // Create the transactions table, function, and trigger
+const createTransactionTableFandT = (db) => {
+  
 db.none(transactions)
   .then(() => {
     console.log("Transaction table created or already exists.");
@@ -73,8 +75,10 @@ db.none(transactions)
     console.log(
       "Function update_transaction_transaction_at created or already exists."
     );
-    const result = checkTriggerExistence()
-    if (result){return}
+    const result = checkTriggerExistence(db);
+    if (result) {
+      return;
+    }
     // Create the trigger
     return db.none(createTrigger);
   })
@@ -89,5 +93,6 @@ db.none(transactions)
       error
     );
   });
+}
 
-module.exports = transactions;
+module.exports = createTransactionTableFandT;

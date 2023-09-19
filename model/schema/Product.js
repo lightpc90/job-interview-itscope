@@ -27,7 +27,7 @@ const createFunction = `
   $$ LANGUAGE plpgsql;
 `;
 
-async function checkTriggerExistence() {
+async function checkTriggerExistence(db) {
   // Table and trigger names
   const tableName = "products";
   const triggerName = "trigger_product_update_updated_at";
@@ -59,33 +59,35 @@ const createTrigger = `
 `;
 
 // Create the product table, function, and trigger
-db.none(products)
-  .then(() => {
-    console.log("Product table created or already exists.");
-    // Create the function
-    return db.none(createFunction);
-  })
-  .then(() => {
-    console.log(
-      "Function update_product_updated_at created or already exists."
-    );
-    // Create the trigger
-    const result = checkTriggerExistence();
-    if (result) {
-      return
-    }
-    return db.none(createTrigger);
-  })
-  .then(() => {
-    console.log(
-      "Trigger trigger_product_update_updated_at created or already exists."
-    );
-  })
-  .catch((error) => {
-    console.error(
-      "Error creating product table, function, and trigger:",
-      error
-    );
-  });
+const createProductTableFandT = (db) => {  
+  db.none(products)
+    .then(() => {
+      console.log("Product table created or already exists.");
+      // Create the function
+      return db.none(createFunction);
+    })
+    .then(() => {
+      console.log(
+        "Function update_product_updated_at created or already exists."
+      );
+      // Create the trigger
+      const result = checkTriggerExistence(db);
+      if (result) {
+        return;
+      }
+      return db.none(createTrigger);
+    })
+    .then(() => {
+      console.log(
+        "Trigger trigger_product_update_updated_at created or already exists."
+      );
+    })
+    .catch((error) => {
+      console.error(
+        "Error creating product table, function, and trigger:",
+        error
+      );
+    });
 
-module.exports = products;
+}
+module.exports = createProductTableFandT;

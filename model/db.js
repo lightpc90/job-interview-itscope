@@ -1,6 +1,10 @@
 require("dotenv").config()
 const pgp = require("pg-promise")();
 
+const createProductTableFandT = require("./schema/Product")
+const createTransactionTableFandT = require("./schema/Transaction");
+const createUserTable = require("./schema/User");
+
 // Database connection configuration
 const dbConfig = {
   host: process.env.DB_HOST, 
@@ -11,5 +15,7 @@ const dbConfig = {
 };
 
 const db = pgp(dbConfig);
-
+ createProductTableFandT(db)
+ createTransactionTableFandT(db)
+ createUserTable(db)
 module.exports = db;

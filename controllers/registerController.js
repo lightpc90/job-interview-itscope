@@ -3,8 +3,8 @@ const bcrypt = require("bcrypt")
 
 const handleRegistration = async (req, res) => {
     const { user, email, pwd, role } = req.body;
-    console.log("role: ", role)
-    if(role !== "Business" || role !== "User" ) return res.status(400).json({message: 'invalid role: Business or User'})
+    console.log(`user: ${user}, email: ${email}, pwd: ${pwd}, role: ${role}`)
+    if(role !== "Business" && role !== "User" ) return res.status(400).json({message: 'invalid role: Business or User'})
   if (!user || !email || !pwd)
     return res
       .status(400)
@@ -29,10 +29,10 @@ const handleRegistration = async (req, res) => {
     // Insert the new user into the database
     const newUser = await db.one(
       "INSERT INTO users (username, role, email, password) VALUES ($1, $2, $3, $4) RETURNING id",
-      [username, role, email, hashedPwd]
+      [user, role, email, hashedPwd]
     );
 
-    console.log("successfully registered... ", result);
+    console.log("successfully registered... ", newUser);
       res.status(201).json({
           success: `New user ${user} created!`,
 userId: newUser.id});

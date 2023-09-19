@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const handleLogin = async (req, res) => {
   try {
     const { user, email, pwd } = req.body;
-    if (!(email || user) || !pwd)
+    if (!((email || user) && pwd))
       return res
         .status(400)
         .json({ message: "Username/Email and Password required" });
@@ -34,7 +34,7 @@ const handleLogin = async (req, res) => {
       expiresIn: "7d",
     });
     //send the token in the response
-    res.status(200).json({ accessToken });
+    res.status(200).json({message: 'successfully logged in..', accessToken: accessToken, data: userInfo });
   } catch (err) {
     console.error("error during login: ", err);
     res.status(500).json({ message: "Internal server error during login" });
