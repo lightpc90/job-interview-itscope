@@ -1,6 +1,13 @@
-const fakePaymentApi = (amount, currency) => {
-    currency = 'usd'
-    const current_date = new Date()
-    const paymentId = `${current_date}-${Math.random()}-${amount}usd`
-    return(paymentId)
+// Simulated payment API call 
+async function callPaymentAPI(amount) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // Simulate a successful payment
+      resolve({ success: true, paymentId: `${Math.random()}.${new Date()}-${amount}usd` });
+      // Simulate a failed payment
+      // reject(new Error('Payment failed.'));
+    }, 1000);
+  });
 }
+
+module.exports = callPaymentAPI

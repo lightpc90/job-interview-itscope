@@ -1,13 +1,13 @@
 const db = require("../model/db");
-const fakePaymentApi = require('../helperFunctions/fakePaymentApi')
-const transactions = require("../model/schema/Transaction");
+const processTransaction = require("../helperFunctions/processTransaction")
 
 //############  function to get the list of all transactions  ###############
 const allTransactions = async (req, res) => {
   try {
     const transactions = await db.any(`SELECT * FROM transactions`);
-    if (transactions.length < 1)
-      return res.status(200).json({ message: "No transaction has been made" });
+    if (!transactions || transactions.length < 1){
+          return res.status(201).json({ message: "No transaction has been made" })
+      };
     //when atleast a transaction has been made
     return res.status(200).json({ data: transactions });
   } catch (err) {
@@ -18,55 +18,19 @@ const allTransactions = async (req, res) => {
 
 //############  function to add a new transaction  ###############
 const addNewTransaction = async (req, res) => {
-    const user_id = req.user.userId
-    const { items: cartItems } = req.body;
-    
+  const user_id = req.user.userId
+  const { cartItems } = req.body;
+  console.log(cartItems)
+
     try {
-        if (!cartItems || cartItems.length < 1) {
-          return res.status(400).json({error: 'No items in cart'})
-        }
-
-        //cart is not empty
-        let productsIds = []
-        let sellersIds = []
-        let amounts = []
-        let quantities = []
-        let total = 0
-
-        for (const item of cartItems) {
-            const itemIsAvailable = await db.oneOrNone(
-                "SELECT * FROM products WHERE id=$1 AND quantities>=$2", [item.id, item.quantity]
-            )
-            if (!itemIsAvailable) {
-                return res.status(404).json({error: `${item.name} is not available or quantity requested is bigger than what is available`})
-            }
-
-            //if item is available
-            const { seller_id } = itemIsAvailable
-
-            productsIds.push(item.id)
-            sellersIds.push(seller_id)
-            amounts.push(item.amount)
-            quantities.push(item.quantity)
-            
-            //cost of each item(s) bought
-            total += item.amount * item.quantity
-        }
-
-        //make payment
-        const paymentId = await fakePaymentApi(total)
-        
-    const transaction = await db.one(
-      "INSERT INTO transactions (buyer_id, products_ids, sellers_ids, amounts, quantities, paymentId) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-      [user_id, productsIds, sellersIds, amounts, quantities, paymentId]
-    );
-        
-    console.log("New transaction recorded: ", transaction);
-    return res.status(200).json({ data: transaction });
-  } catch (err) {
-    console.error("Internal server error: ", err);
-    return res.status(500).json({ message: "Internal server error: " });
-  }
+      const transaction = await processTransaction(user_id, cartItems)
+      console.log('transaction return: ',transaction)
+      console.log("New transaction recorded: ");
+      return res.status(200).json({ message: 'Transaction successful' });
+    } catch (err) {
+      console.error("Internal server error: ", err);
+      return res.status(500).json({ message: "Internal server error: " });
+    }
 };
 
 
@@ -81,14 +45,12 @@ const getSingleTransaction = async (req, res) => {
     return res.status(400).json({ error: `No transaction with Id ${transaction_id}` });
   }
 
-  res.status(200).json({ transaction });
+  res.status(200).json({data: transaction });
 };
 
 //############  function to get a user transactions  ###############
 const getMyTransactions = async (req, res) => {
-    const { user_id } = req.params;
-    const current_userId = req.user.userId
-    if(current_userId !== user_id) return res.status(401).json({message: 'access denied: unauthorized user'})
+    const user_id = req.params.user_id;
   try {
     //get the current user's transactions
     const myTransactions = await db.any(
@@ -97,7 +59,7 @@ const getMyTransactions = async (req, res) => {
     );
 
     //if transaction not found
-    if (!myTransactions) {
+    if (!myTransactions || myTransactions.length < 1) {
       console.log("No transaction for user with Id: ", user_id);
       return res.status(404).json({ error: `No transaction found with user with Id ${user_id}` });
     }
@@ -114,36 +76,36 @@ const getMyTransactions = async (req, res) => {
 
 //############  function to get a business transactions  ###############
 const getMyBusinessTransactions = async (req, res) => {
-    const { business_id } = req.params;
-    const current_userId = req.user.userId
-    if(current_userId !== business_id) return res.status(401).json({message: 'access denied: unauthorized user'})
+  const { business_id } = req.params;
+  console.log("business id: ", business_id)
   try {
     //get the transactions that the current business is involved
     const inclusiveTransactions = await db.any(
       `SELECT * FROM transactions WHERE $1=ANY(sellers_ids)`,
-      [seller_id]
+      [business_id]
     );
-
+      console.log("inclusiveTransactions: ", inclusiveTransactions);
     //if transaction not found
     if (!inclusiveTransactions) {
-      console.log("No transaction for business with Id: ", user_id);
+      console.log("No transaction for business with Id: ", business_id);
       return res.status(404).json({ error: `No transaction found` });
     }
       const myTransactions = []
     //extract orders that are only for the current business from inclusiveTransactions 
-      for (let i = 0; i < inclusiveTransactions.length; i++){
-        const myPosition = inclusiveTransactions[i].sellers_ids.indexOf(seller_id);
+      for (const myTransaction of inclusiveTransactions){
+        const myPosition = myTransaction.sellers_ids.indexOf(business_id);
 
         //extracted transaction for the current business
         const eachTransction = {
-          id: inclusiveTransactions[i].id,
-          product_id: inclusiveTransactions[i].products_ids[myPosition],
-          buyer_id: inclusiveTransactions[i].buyers_ids[myPosition],
-          amount: inclusiveTransactions[i].amounts[myPosition],
-          quantity: inclusiveTransactions[i].quantities[myPosition],
-          paymentId: inclusiveTransactions[i].paymentId,
-          transaction_at: inclusiveTransactions[i].transaction_at,
+          id: `${Math.random()-new Date()}`,
+          product_id: myTransaction.products_ids[myPosition],
+          buyer_id: myTransaction.buyer_id[myPosition],
+          amount: myTransaction.amounts[myPosition],
+          quantity: myTransaction.quantities[myPosition],
+          paymentId: myTransaction.paymentId,
+          transaction_at: myTransaction.transaction_at,
         };
+        console.log("each transaction: ", eachTransction)
         myTransactions.push(eachTransction)
       }
 

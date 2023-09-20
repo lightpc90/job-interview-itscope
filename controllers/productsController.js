@@ -67,8 +67,8 @@ const updateProduct = async (req, res) => {
     try {
       //update the product
       const updatedProduct = await db.oneOrNone(
-        `UPDATE products SET name=$1, imagesurls=$2, status=$3, quantity=$4, amount=$5 WHERE business_id=$6 AND id=$7 RETURNING *`,
-        [name, imagesurls, status, quantity, amount, business_id, product_id]
+        `UPDATE products SET name=$1, imagesurls=$2, status=$3, quantity=$4, amount=$5, updated_at=$6 WHERE business_id=$7 AND id=$8 RETURNING *`,
+        [name, imagesurls, status, quantity, amount, new Date(), business_id, product_id]
       );
         console.log(updatedProduct)
       //if product not found 
@@ -91,8 +91,6 @@ const updateProduct = async (req, res) => {
 //############  function to delete a product  ###############
 const handleProductDelete = async(req, res) => {
     const { product_id, business_id } = req.params
-    const current_user = req.user.userId
-    if(current_user !== business_id) return res.status(401).json({message: 'unauthorized: access denied'})
 
     try {
         //check if the product exists and it belongs to the current business before attempting deletion

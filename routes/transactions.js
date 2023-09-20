@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const verifyParam = require("../middleware/verifyParam")
 const isAdmin = require("../middleware/isAdmin")
+const isVerifiedBusiness = require("../middleware/isVerifiedBusiness")
 const {
   allTransactions,
   addNewTransaction,
@@ -10,17 +12,15 @@ const {
 } = require("../controllers/transactionsController");
 
 
-router.route("/").get(isAdmin, allTransactions);
+router.get("/", isAdmin, allTransactions);
 
-router.route("/transaction/").post(addNewTransaction);
+router.post("/transaction/:user_id", verifyParam, addNewTransaction);
 
-router.route("/transaction/:transaction_id/").get(getSingleTransaction);
-  
+router.get("/transaction/:transaction_id/", isAdmin, getSingleTransaction); 
 
-router.route('/my-transactions/:user_id')
-    .get(getMyTransactions)
+router.get('/my-transactions/:user_id', verifyParam, getMyTransactions)
 
-router.route("/my-business-transactions/:business_id").get(getMyBusinessTransactions);
+router.get("/my-business-transactions/:business_id", isVerifiedBusiness, getMyBusinessTransactions);
 
 
 module.exports = router;

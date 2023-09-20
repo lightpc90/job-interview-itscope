@@ -15,7 +15,7 @@ const dbConfig = {
 };
 
 const db = pgp(dbConfig);
- createProductTableFandT(db)
- createTransactionTableFandT(db)
- createUserTable(db)
+createProductTableFandT(db)
+createTransactionTableFandT(db)
+createUserTable(db)
 module.exports = db;
