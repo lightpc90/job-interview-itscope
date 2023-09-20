@@ -1,4 +1,3 @@
-const db = require("../db")
 
 // Define the user table schema
 const users = `
