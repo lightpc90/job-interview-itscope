@@ -20,8 +20,6 @@ const createTransactionTable = (db) => {
 db.none(transactions)
   .then(() => {
     console.log("Transaction table created or already exists.");
-    // Create the function
-    return db.none(createFunction);
   })
   .catch((error) => {
     console.error(

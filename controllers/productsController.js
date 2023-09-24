@@ -1,10 +1,11 @@
 const db = require("../model/db")
+const cloudinary = require("../config/cloudinary/storeImage")
 
 
 //############  function to get the list of all products  ###############
 const allProducts = async (req, res) => {
     try {
-        const products = await db.any(`SELECT * FROM products`);
+        const products = await db.any(`SELECT * FROM products WHERE status=$1 OR status=$2`, ["sold", "available"]);
         if (!products || products.length < 1) return res.status(400).json({ message: 'No product has been listed' })
         //when atleast a product has been listed
         return res.status(200).json({data: products})
@@ -19,7 +20,17 @@ const allProducts = async (req, res) => {
 //############  function to add a new product  ###############
 const addNewProduct = async (req, res) => {
     const {business_id} = req.params
-    const {name, imagesUrls, status, quantity, amount} = req.body
+    const { name, status, quantity, amount } = req.body
+    
+     const imageFiles = req.files.images; // 'images' used as the field name for multiple file uploads
+     // Upload each image to Cloudinary and collect their URLs
+     const imagesUrls = await Promise.all(
+       imageFiles.map(async (imageFile) => {
+         const result = await cloudinary.uploader.upload(imageFile.path);
+         return result.secure_url;
+       })
+     );
+    
     try {
         const product = await db.oneOrNone(
           "INSERT INTO products (name, imagesurls, business_id, status, quantity, amount) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
@@ -37,7 +48,7 @@ const addNewProduct = async (req, res) => {
 //############  function to get a product  ###############
 const getSingleProduct = async(req, res) => {
     const { product_id } = req.params
-    const product = await db.oneOrNone(`SELECT * FROM products WHERE id = $1`, [product_id])
+    const product = await db.oneOrNone(`SELECT * FROM products WHERE id = $1 AND (status=$2 OR status=$3)`, [product_id, "sold", "available"])
     if (!product) {
         console.log("No product with Id: ", product_id)
         return res.status(400).json({error: `No product with Id ${product_id}`})

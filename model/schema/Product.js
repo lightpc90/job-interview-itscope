@@ -20,8 +20,6 @@ const createProductTable = (db) => {
   db.none(products)
     .then(() => {
       console.log("Product table created or already exists.");
-      // Create the function
-      return db.none(createFunction);
     })
     .catch((error) => {
       console.error(

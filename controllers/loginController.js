@@ -1,4 +1,6 @@
 require("dotenv").config();
+const response = require("../config/aws-env")
+const secret = response.SecretString;
 const db = require("../model/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -30,7 +32,7 @@ const handleLogin = async (req, res) => {
     };
 
     //create JWT
-    const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET, {
+    const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET || secret.api_access_token, {
       expiresIn: "7d",
     });
     //send the token in the response
