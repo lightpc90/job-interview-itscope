@@ -1,4 +1,4 @@
-require("dotenv").config();
+
 const response = require("../config/aws-env")
 const secret = response.SecretString;
 const db = require("../model/db");

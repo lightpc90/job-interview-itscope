@@ -1,5 +1,4 @@
 const response = require("../config/aws-env")
-require("dotenv").config();
 const pgp = require("pg-promise")();
 
 const createProductTable = require("./schema/Product");
