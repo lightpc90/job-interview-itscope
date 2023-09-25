@@ -1,4 +1,4 @@
-const db = require('../model/db')
+
 
 const verifyParam = async (req, res, next) => {
     const current_user = parseInt(req.user.userId)

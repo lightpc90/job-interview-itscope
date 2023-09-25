@@ -32,7 +32,7 @@ const handleLogin = async (req, res) => {
     };
 
     //create JWT
-    const accessToken = jwt.sign(userInfo, process.env.ACCESS_TOKEN_SECRET || secret.api_access_token, {
+    const accessToken = jwt.sign(userInfo, process.env?.ACCESS_TOKEN_SECRET || secret.api_access_token, {
       expiresIn: "7d",
     });
     //send the token in the response
