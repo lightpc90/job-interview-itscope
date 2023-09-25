@@ -1,9 +1,8 @@
 // AWS JS SDK TO RETRIVE SECRET/.ENV VARIABLES
-
-import {
+const {
   SecretsManagerClient,
   GetSecretValueCommand,
-} from "@aws-sdk/client-secrets-manager";
+} = require("@aws-sdk/client-secrets-manager");
 
 const secret_name = "postgrescredentials";
 
