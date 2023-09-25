@@ -12,16 +12,20 @@ const client = new SecretsManagerClient({
 
 let response;
 
-try {
-  response = await client.send(
-    new GetSecretValueCommand({
-      SecretId: secret_name,
-      VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
-    })
-  );
-} catch (error) {
-  throw error;
+const getSecretValues = async () => {
+  try {
+    response = await client.send(
+      new GetSecretValueCommand({
+        SecretId: secret_name,
+        VersionStage: "AWSCURRENT", // VersionStage defaults to AWSCURRENT if unspecified
+      })
+    );
+  } catch (error) {
+    throw error;
+  }
+
 }
+getSecretValues()
 
 
 module.exports = response
