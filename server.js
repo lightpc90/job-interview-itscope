@@ -2,9 +2,8 @@
 //load env file
 require("dotenv").config();
 
-const response = require("./config/aws-env");
-const secret = response.SecretString;
-
+const response = require("./config/aws-env")
+const secret = response.SecretString
 //import express app
 const express = require("express");
 const app = express();
