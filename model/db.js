@@ -1,19 +1,17 @@
-const response = require("../config/aws-env")
+
 const pgp = require("pg-promise")();
 
 const createProductTable = require("./schema/Product");
 const createTransactionTable = require("./schema/Transaction");
 const createUserTable = require("./schema/User");
 
-const secret = response.SecretString;
-
 // Database connection configuration
 const dbConfig = {
-  host: process.env.DB_HOST || secret.host,
-  port: process.env.DB_PORT || secret.port,
-  database: process.env.DB_NAME || secret.dbInstanceIdentifier,
-  user: process.env.DB_USER || secret.username,
-  password: process.env.DB_PASSWORD || secret.password,
+  host: process.env.DB_HOST || process.env.AWS_DB_ENDPOINT,
+  port: process.env.DB_PORT || process.env.AWS_DB_PORT,
+  database: process.env.DB_NAME || process.env.AWS_DB_NAME,
+  user: process.env.DB_USER || process.env.AWS_DB_USER,
+  password: process.env.DB_PASSWORD || process.env.AWS_DB_PWD,
 };
 
 const db = pgp(dbConfig);

@@ -2,8 +2,6 @@
 //load env file
 require("dotenv").config();
 
-const response = require("./config/aws-env")
-const secret = response.SecretString
 //import express app
 const express = require("express");
 const app = express();
@@ -17,7 +15,7 @@ const verifyJWT = require("./middleware/verifyJWT");
 const path = require("path");
 const db = require("./model/db");
 
-const PORT = process.env.PORT || secret.port;
+const PORT = process.env.PORT || process.env.AWS_DB_PORT;
 
 //Cross Origin Resource Sharing...
 app.use(cors(corsOptions));

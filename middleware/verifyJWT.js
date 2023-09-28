@@ -1,6 +1,4 @@
 
-const response = require("../config/aws-env")
-const secret = response.SecretString;
 const jwt = require("jsonwebtoken");
 const { blacklistTokens } = require("../helperFunctions/addTokenToBlacklist");
 
@@ -15,7 +13,7 @@ const verifyJWT = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized: Token is invalid" });
   }
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET || secret.api_access_token, (err, decoded) => {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.sendStatus(403); //invalid token
     //pass the user
     req.user = decoded;
