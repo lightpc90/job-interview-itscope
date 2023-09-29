@@ -27,6 +27,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //routes
+// Health check endpoint
+app.get('/health', async (req, res) => {
+  try {
+    // Attempt to connect to the database
+    await db.any('SELECT 1');
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.use("/api/v1/", require("./routes/root"));
 app.use("/api/v1/register", require("./routes/register"));
 app.use("/api/v1/login", require("./routes/login"));
