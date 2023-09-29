@@ -14,7 +14,8 @@ const verifyJWT = require("./middleware/verifyJWT");
 const path = require("path");
 const db = require("./model/db");
 
-const PORT = process.env.PORT || process.env.AWS_DB_PORT;
+const PORT = process.env.PORT || process.env.AWS_PORT;
+console.log("app port: ", PORT)
 
 //Cross Origin Resource Sharing...
 app.use(cors(corsOptions));
