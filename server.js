@@ -1,9 +1,14 @@
+console.log("before loading the env file")
 //load env file
 require("dotenv").config();
+
+console.log("after loading env files: ", process.env)
 
 //import express app
 const express = require("express");
 const app = express();
+
+console.log("express app started... ")
 
 //import cross origin resource sharing...
 const cors = require("cors");
@@ -38,6 +43,11 @@ app.get('/health', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+app.get("/", (req, res) => {
+  console.log("connected successfully, hello world")
+  res.status(200).json({message: "Hello World"})
+})
 
 app.use("/api/v1/", require("./routes/root"));
 app.use("/api/v1/register", require("./routes/register"));
