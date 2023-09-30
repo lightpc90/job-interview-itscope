@@ -24,7 +24,7 @@ console.log("app port: ", PORT)
 
 //Cross Origin Resource Sharing...
 app.use(cors(corsOptions));
-
+console.log("passed CORS...");
 //Middleware to parse JSON data
 app.use(express.json());
 
