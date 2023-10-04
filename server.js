@@ -32,6 +32,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 //routes
+
+app.get("/", (req, res) => {
+  console.log("connected successfully, hello world");
+  res.status(200).json({ message: "Hello World" });
+});
+
+
 // Health check endpoint
 app.get('/health', async (req, res) => {
   try {
@@ -43,11 +50,6 @@ app.get('/health', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
-app.get("/", (req, res) => {
-  console.log("connected successfully, hello world")
-  res.status(200).json({message: "Hello World"})
-})
 
 app.use("/api/v1/", require("./routes/root"));
 app.use("/api/v1/register", require("./routes/register"));

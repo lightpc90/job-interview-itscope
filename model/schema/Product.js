@@ -27,6 +27,6 @@ const createProductTable = (db) => {
         error
       );
     });
-
 }
+
 module.exports = createProductTable
